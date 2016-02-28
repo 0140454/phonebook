@@ -9,7 +9,7 @@
 #define DICT_FILE "./dictionary/words.txt"
 
 #if defined(HASH)
-#define TABLE_SIZE 32767
+#define TABLE_SIZE 1000
 #endif
 
 static double diff_in_second(struct timespec t1, struct timespec t2)
@@ -42,9 +42,8 @@ int main(int argc, char *argv[])
 
     /* build the entry */
 #if defined(HASH)
-    entry *pHead, *e[TABLE_SIZE];
+    entry pHead[TABLE_SIZE], *e[TABLE_SIZE];
     printf("size of entry : %lu bytes\n", sizeof(entry));
-    pHead = (entry *) malloc(TABLE_SIZE * sizeof(entry));
     for (i = 0; i < TABLE_SIZE; ++i) {
         e[i] = &pHead[i];
         e[i]->pNext = NULL;
@@ -145,8 +144,8 @@ int main(int argc, char *argv[])
     }
 #else
     if (pHead->pNext) free(pHead->pNext);
-#endif
     free(pHead);
+#endif
 
     return 0;
 }
