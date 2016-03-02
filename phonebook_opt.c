@@ -27,11 +27,11 @@ entry *append(char lastName[], entry *e)
 
 unsigned int hashfunction(char *str)
 {
-    unsigned int hash = 0;
+    unsigned int hash = 5381;
 
     while (*str) {
-        hash += (*str++);
+        hash += (hash << 5) + (*str++);
     }
 
-    return hash;
+    return (hash & 0x7FFFFFFF);
 }
