@@ -3,7 +3,7 @@ CFLAGS_common ?= -Wall -std=gnu99
 CFLAGS_orig = -O0
 CFLAGS_opt  = -O0
 
-EXEC = phonebook_orig phonebook_opt phonebook_hash phonebook_trie
+EXEC = phonebook_orig phonebook_opt phonebook_hash phonebook_trie phonebook_rbtree
 all: $(EXEC)
 
 SRCS_common = main.c
@@ -25,7 +25,12 @@ phonebook_hash: $(SRCS_common) phonebook_opt.c phonebook_opt.h
 
 phonebook_trie: $(SRCS_common) phonebook_trie.c phonebook_trie.h
 	$(CC) $(CFLAGS_common) $(CFLAGS_opt) \
-		-DIMPL="\"$@.h\"" -DTRIE -g -o $@ \
+		-DIMPL="\"$@.h\"" -DTRIE -o $@ \
+		$(SRCS_common) $@.c
+
+phonebook_rbtree: $(SRCS_common) phonebook_rbtree.c phonebook_rbtree.h
+	$(CC) $(CFLAGS_common) $(CFLAGS_opt) \
+		-DIMPL="\"$@.h\"" -DRBTREE -o $@ \
 		$(SRCS_common) $@.c
 
 run: $(EXEC)
@@ -45,6 +50,9 @@ cache-test: $(EXEC)
 	perf stat --repeat 100 \
 		-e cache-misses,cache-references,instructions,cycles \
 		./phonebook_trie
+	perf stat --repeat 100 \
+		-e cache-misses,cache-references,instructions,cycles \
+		./phonebook_rbtree
 
 output.txt: cache-test calculate
 	./calculate
@@ -58,4 +66,4 @@ calculate: calculate.c
 .PHONY: clean
 clean:
 	$(RM) $(EXEC) *.o perf.* \
-	      	calculate trie.txt hash.txt orig.txt opt.txt output.txt runtime.png
+	      	calculate rbtree.txt trie.txt hash.txt orig.txt opt.txt output.txt runtime.png
