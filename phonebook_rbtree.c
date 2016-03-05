@@ -2,8 +2,20 @@
 #include <string.h>
 
 #include "phonebook_rbtree.h"
+#include "memory_pool.h"
 
+static memory_pool *pool = NULL;
 static entry *nil = NULL;
+
+void init_memory_pool(int size)
+{
+    pool = pool_init(size);
+}
+
+void free_memory_pool(void)
+{
+    pool_free(pool);
+}
 
 entry *left_rotate(entry *pHead, entry *x)
 {
@@ -136,10 +148,10 @@ entry *findName(char lastname[], entry *pHead)
 entry *append(char lastName[], entry *pHead)
 {
     if (pHead == NULL) {
-        nil = (entry *) malloc(sizeof(entry));
+        nil = (entry *) pool_alloc(pool, sizeof(entry));
         nil->color = BLACK;
 
-        entry *new_node = (entry *) malloc(sizeof(entry));
+        entry *new_node = (entry *) pool_alloc(pool, sizeof(entry));
         strcpy(new_node->lastName, lastName);
         new_node->color = BLACK;
         new_node->pParent = new_node->pLeft = new_node->pRight = nil;
@@ -160,7 +172,7 @@ entry *append(char lastName[], entry *pHead)
             return pHead;
     }
 
-    entry *new_node = (entry *) malloc(sizeof(entry));
+    entry *new_node = (entry *) pool_alloc(pool, sizeof(entry));
     strcpy(new_node->lastName, lastName);
     new_node->pLeft = new_node->pRight = nil;
     new_node->pParent = parent;
@@ -173,14 +185,4 @@ entry *append(char lastName[], entry *pHead)
     pHead = fix_after_append(pHead, new_node);
 
     return pHead;
-}
-
-void free_rbtree(entry *pHead)
-{
-    if (pHead == nil)
-        return;
-
-    free_rbtree(pHead->pLeft);
-    free_rbtree(pHead->pRight);
-    free(pHead);
 }

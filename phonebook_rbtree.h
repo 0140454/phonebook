@@ -34,9 +34,9 @@ typedef struct __PHONE_BOOK {
     Color color;
 } entry;
 
+void init_memory_pool(int size);
+void free_memory_pool(void);
 entry *findName(char lastname[], entry *pHead);
 entry *append(char lastName[], entry *pHead);
-
-void free_rbtree(entry *pHead);
 
 #endif

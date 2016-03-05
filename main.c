@@ -40,6 +40,13 @@ int main(int argc, char *argv[])
         return -1;
     }
 
+    /* initialize memory pool */
+#if defined(TRIE)
+    init_memory_pool(sizeof(entry) * 350000 * 13);
+#else
+    init_memory_pool(sizeof(entry) * 350000);
+#endif
+
     /* build the entry */
 #if defined(HASH)
     entry pHead[TABLE_SIZE], *e[TABLE_SIZE];
@@ -162,16 +169,8 @@ int main(int argc, char *argv[])
     printf("execution time of append() : %lf sec\n", cpu_time1);
     printf("execution time of findName() : %lf sec\n", cpu_time2);
 
-#if defined(HASH)
-    for (i = 0; i < TABLE_SIZE; ++i) {
-        if (pHead[i].pNext) free(pHead[i].pNext);
-    }
-#elif defined(TRIE)
-    free_trie(pHead);
-#elif defined(RBTREE)
-    free_rbtree(pHead);
-#else
-    if (pHead->pNext) free(pHead->pNext);
+    free_memory_pool();
+#if !defined(HASH) && !defined(RBTREE)
     free(pHead);
 #endif
 
